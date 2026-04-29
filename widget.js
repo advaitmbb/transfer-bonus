@@ -38,11 +38,9 @@
     '.mbb-meta-label{color:#a0b0be;font-weight:500}',
     '.mbb-meta-value{color:#1a2b3c;font-weight:600}',
     '.mbb-meta-value.expiring{color:#c07000}',
-    '.mbb-tooltip-wrap{position:relative;display:inline-flex;align-items:center;gap:4px}',
-    '.mbb-info-icon{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:100px;background:#d8e4ee;color:#6b7e8f;font-size:9px;font-weight:700;font-style:normal;cursor:default;line-height:1;flex-shrink:0}',
-    '.mbb-tooltip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#1a2b3c;color:#fff;font-size:.72rem;font-weight:400;line-height:1.4;padding:7px 10px;border-radius:8px;white-space:nowrap;z-index:100;pointer-events:none;min-width:max-content}',
-    '.mbb-tooltip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#1a2b3c}',
-    '.mbb-tooltip-wrap:hover .mbb-tooltip{display:block}',
+    '.mbb-info-icon{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:100px;background:#d8e4ee;color:#6b7e8f;font-size:9px;font-weight:700;font-style:normal;cursor:default;line-height:1;flex-shrink:0;margin-left:4px;vertical-align:middle}',
+    '#mbb-tip{position:fixed;background:#1a2b3c;color:#fff;font-family:"Inter",sans-serif;font-size:.72rem;font-weight:400;line-height:1.4;padding:7px 10px;border-radius:8px;white-space:nowrap;z-index:99999;pointer-events:none;display:none}',
+    '#mbb-tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#1a2b3c}',
     '.mbb-state{grid-column:1/-1;text-align:center;padding:56px 24px;color:#a0b0be;font-size:.95rem}',
     '.mbb-section-label{font-family:"Fraunces",serif;font-size:1.1rem;font-weight:600;color:#a0b0be;text-align:center;margin-bottom:20px;max-width:1080px;margin-left:auto;margin-right:auto}',
     '.mbb-expired-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:1080px;margin:0 auto;opacity:.55}',
@@ -77,6 +75,24 @@
     '</div>'
   ].join('');
   me.parentNode.insertBefore(wrapper, me);
+
+  /* ── Body-level tooltip ── */
+  var tip = document.createElement('div');
+  tip.id = 'mbb-tip';
+  document.body.appendChild(tip);
+
+  document.addEventListener('mouseover', function(e) {
+    var icon = e.target.closest ? e.target.closest('.mbb-info-icon') : null;
+    if (!icon) return;
+    tip.textContent = icon.getAttribute('data-tip');
+    tip.style.display = 'block';
+    var r = icon.getBoundingClientRect();
+    tip.style.left = (r.left + r.width / 2 - tip.offsetWidth / 2) + 'px';
+    tip.style.top  = (r.top - tip.offsetHeight - 8) + 'px';
+  });
+  document.addEventListener('mouseout', function(e) {
+    if (e.target.closest && e.target.closest('.mbb-info-icon')) tip.style.display = 'none';
+  });
 
   /* ── Data & logic ── */
   var API_URL = 'https://script.google.com/macros/s/AKfycby5q9p_Ik2MA8ePJCH0PjdDeRaCqmO2eSpRRGM6SV3Xf6n4WgI5_gUp3ioNqy6dEbF4/exec';
@@ -160,9 +176,9 @@
       + '<div class="mbb-partner">' + partner + '</div>'
       + '<div class="mbb-divider"></div>'
       + '<div class="mbb-meta">'
-      + '<div class="mbb-meta-row"><span class="mbb-meta-label"><span class="mbb-tooltip-wrap">Transfer Ratio'
-      + '<i class="mbb-info-icon">i</i><span class="mbb-tooltip">Ratio already includes the transfer bonus amount</span>'
-      + '</span></span><span class="mbb-meta-value">' + ratio + '</span></div>'
+      + '<div class="mbb-meta-row"><span class="mbb-meta-label">Transfer Ratio'
+      + '<i class="mbb-info-icon" data-tip="Ratio already includes the transfer bonus amount">i</i>'
+      + '</span><span class="mbb-meta-value">' + ratio + '</span></div>'
       + '<div class="mbb-meta-row"><span class="mbb-meta-label">' + (expired ? 'Expired' : 'Expires') + '</span>' + expiresVal + '</div>'
       + '</div></div>';
   }
