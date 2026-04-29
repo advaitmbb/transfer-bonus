@@ -85,10 +85,16 @@
     var icon = e.target.closest ? e.target.closest('.mbb-info-icon') : null;
     if (!icon) return;
     tip.textContent = icon.getAttribute('data-tip');
+    tip.style.visibility = 'hidden';
     tip.style.display = 'block';
-    var r = icon.getBoundingClientRect();
-    tip.style.left = (r.left + r.width / 2 - tip.offsetWidth / 2) + 'px';
-    tip.style.top  = (r.top - tip.offsetHeight - 8) + 'px';
+    var r   = icon.getBoundingClientRect();
+    var tw  = tip.offsetWidth;
+    var th  = tip.offsetHeight;
+    var left = r.left + r.width / 2 - tw / 2;
+    left = Math.max(8, Math.min(left, window.innerWidth - tw - 8));
+    tip.style.left = left + 'px';
+    tip.style.top  = (r.top + window.scrollY - th - 8) + 'px';
+    tip.style.visibility = 'visible';
   });
   document.addEventListener('mouseout', function(e) {
     if (e.target.closest && e.target.closest('.mbb-info-icon')) tip.style.display = 'none';
