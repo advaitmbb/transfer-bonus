@@ -27,7 +27,7 @@
     '.mbb-card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}',
     '.mbb-card-top-left{display:flex;align-items:center;gap:8px;flex-wrap:wrap}',
     '.mbb-program-badge{background:#1a2b3c;color:#fff;font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:5px 12px;border-radius:100px}',
-    '.mbb-expiring-badge{background:#fff3cd;color:#c07000;font-size:.68rem;font-weight:700;padding:5px 10px;border-radius:100px;letter-spacing:.02em}',
+    '.mbb-expiring-badge{background:#fff3cd;color:#c07000;font-size:.68rem;font-weight:700;padding:5px 10px;border-radius:100px;letter-spacing:.02em;white-space:nowrap;flex-shrink:0;align-self:flex-start}',
     '.mbb-bonus-wrap{margin-bottom:4px}',
     '.mbb-bonus{font-family:"Fraunces",serif;font-size:3.4rem;font-weight:700;color:#38b6ff;line-height:1;display:block}',
     '.mbb-bonus-label{font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#a0b0be;margin-top:2px;display:block}',
