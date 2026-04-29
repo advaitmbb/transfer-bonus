@@ -22,10 +22,10 @@
     '.mbb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;max-width:1080px;margin:0 auto 56px}',
     '@media(max-width:860px){.mbb-grid{grid-template-columns:repeat(2,1fr)}}',
     '@media(max-width:540px){.mbb-grid{grid-template-columns:1fr;gap:16px}}',
-    '.mbb-card{background:#fff;border-radius:20px;padding:26px 24px 22px;box-shadow:0 2px 16px rgba(26,43,60,.07);display:flex;flex-direction:column;gap:0;transition:transform .2s ease,box-shadow .2s ease;position:relative}',
+    '.mbb-card{background:#fff;border-radius:20px;padding:26px 24px 22px;box-shadow:0 2px 16px rgba(26,43,60,.07);display:flex;flex-direction:column;gap:0;transition:transform .2s ease,box-shadow .2s ease;position:relative;border-top:4px solid #38b6ff}',
     '.mbb-card:hover{transform:translateY(-4px);box-shadow:0 10px 32px rgba(26,43,60,.13)}',
-    '.mbb-card::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:#38b6ff;border-radius:20px 20px 0 0}',
     '.mbb-card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}',
+    '.mbb-card-top-left{display:flex;align-items:center;gap:8px;flex-wrap:wrap}',
     '.mbb-program-badge{background:#1a2b3c;color:#fff;font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:5px 12px;border-radius:100px}',
     '.mbb-expiring-badge{background:#fff3cd;color:#c07000;font-size:.68rem;font-weight:700;padding:5px 10px;border-radius:100px;letter-spacing:.02em}',
     '.mbb-bonus-wrap{margin-bottom:4px}',
@@ -46,13 +46,12 @@
     '.mbb-expired-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:1080px;margin:0 auto;opacity:.55}',
     '@media(max-width:860px){.mbb-expired-grid{grid-template-columns:repeat(2,1fr)}}',
     '@media(max-width:540px){.mbb-expired-grid{grid-template-columns:1fr}}',
-    '.mbb-card.mbb-expired{background:#f3f0ea;box-shadow:none}',
-    '.mbb-card.mbb-expired::before{background:#c8bfb0}',
+    '.mbb-card.mbb-expired{background:#f3f0ea;box-shadow:none;border-top-color:#c8bfb0}',
     '.mbb-card.mbb-expired .mbb-bonus{color:#bbb}',
     '.mbb-card.mbb-expired .mbb-program-badge{background:#9aabbb}',
     '.mbb-card.mbb-expired:hover{transform:none;box-shadow:none}',
     '.mbb-expired-tag{background:#e2ddd4;color:#8a9aaa;font-size:.68rem;font-weight:700;letter-spacing:.04em;padding:5px 10px;border-radius:100px}',
-    '.mbb-rating{display:inline-flex;align-items:center;gap:3px;padding:4px 10px;border-radius:100px;font-size:.72rem;font-weight:700;margin-top:8px}',
+    '.mbb-rating{display:inline-flex;align-items:center;gap:3px;padding:4px 10px;border-radius:100px;font-size:.72rem;font-weight:700}',
     '.mbb-rating.pos{background:#e6f9f0;color:#1a7a4a}',
     '.mbb-rating.neg{background:#fdecea;color:#c0392b}'
   ].join('');
@@ -191,8 +190,10 @@
       :              '<span class="mbb-meta-value">' + fmtDate(end) + '</span>';
 
     return '<div class="mbb-card' + (expired ? ' mbb-expired' : '') + '">'
-      + '<div class="mbb-card-top"><span class="mbb-program-badge">' + program + '</span>' + badge + '</div>'
-      + (rating ? '<div>' + rating + '</div>' : '')
+      + '<div class="mbb-card-top">'
+      +   '<div class="mbb-card-top-left"><span class="mbb-program-badge">' + program + '</span>' + rating + '</div>'
+      +   badge
+      + '</div>'
       + '<div class="mbb-bonus-wrap"><span class="mbb-bonus">' + bonus + '</span><span class="mbb-bonus-label">Transfer Bonus</span></div>'
       + '<div class="mbb-partner">' + partner + '</div>'
       + '<div class="mbb-divider"></div>'
