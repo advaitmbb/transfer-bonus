@@ -43,14 +43,13 @@
     '#mbb-tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#1a2b3c}',
     '.mbb-state{grid-column:1/-1;text-align:center;padding:56px 24px;color:#a0b0be;font-size:.95rem}',
     '.mbb-section-label{font-family:"Fraunces",serif;font-size:1.1rem;font-weight:600;color:#a0b0be;text-align:center;margin-bottom:20px;max-width:1080px;margin-left:auto;margin-right:auto}',
-    '.mbb-expired-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:1080px;margin:0 auto;opacity:.55}',
-    '@media(max-width:860px){.mbb-expired-grid{grid-template-columns:repeat(2,1fr)}}',
-    '@media(max-width:540px){.mbb-expired-grid{grid-template-columns:1fr}}',
-    '.mbb-card.mbb-expired{background:#f3f0ea;box-shadow:none;border-top-color:#c8bfb0}',
-    '.mbb-card.mbb-expired .mbb-bonus{color:#bbb}',
-    '.mbb-card.mbb-expired .mbb-program-badge{background:#9aabbb}',
-    '.mbb-card.mbb-expired:hover{transform:none;box-shadow:none}',
-    '.mbb-expired-tag{background:#e2ddd4;color:#8a9aaa;font-size:.68rem;font-weight:700;letter-spacing:.04em;padding:5px 10px;border-radius:100px}',
+    '.mbb-exp-table{width:100%;max-width:1080px;margin:0 auto;border-collapse:collapse;opacity:.7}',
+    '.mbb-exp-table th{font-family:"Inter",sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#a0b0be;padding:8px 12px;text-align:left;border-bottom:2px solid #e8e4dc}',
+    '.mbb-exp-table td{font-size:.84rem;color:#6b7e8f;padding:10px 12px;border-bottom:1px solid #f0ece3;vertical-align:middle}',
+    '.mbb-exp-table tr:last-child td{border-bottom:none}',
+    '.mbb-exp-table tr:hover td{background:#f8f5ef}',
+    '.mbb-exp-prog{font-size:.68rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:#e2ddd4;color:#8a9aaa;padding:3px 8px;border-radius:100px;white-space:nowrap}',
+    '.mbb-exp-bonus{font-family:"Fraunces",serif;font-size:1rem;font-weight:700;color:#bbb}',
     '.mbb-rating{display:inline-flex;align-items:center;gap:3px;padding:4px 10px;border-radius:100px;font-size:.72rem;font-weight:700}',
     '.mbb-rating.pos{background:#e6f9f0;color:#1a7a4a}',
     '.mbb-rating.neg{background:#fdecea;color:#c0392b}'
@@ -71,8 +70,11 @@
     '  <div class="mbb-filters" id="mbb-filters"><button class="mbb-filter-btn active" data-filter="all">All Bonuses</button></div>',
     '  <div class="mbb-grid" id="mbb-grid"><div class="mbb-state">Loading bonuses…</div></div>',
     '  <div id="mbb-expired-wrap" style="display:none">',
-    '    <p class="mbb-section-label">Recently Expired</p>',
-    '    <div class="mbb-expired-grid" id="mbb-expired-grid"></div>',
+    '    <p class="mbb-section-label">Expired Bonuses</p>',
+    '    <table class="mbb-exp-table">',
+    '      <thead><tr><th>Program</th><th>Partner</th><th>Bonus</th><th>Expired</th><th>Bonus Ratio</th><th>Advait\'s Rating</th></tr></thead>',
+    '      <tbody id="mbb-expired-table-body"></tbody>',
+    '    </table>',
     '  </div>',
     '</div>'
   ].join('');
@@ -173,7 +175,7 @@
     var partner  = row['Partner'] || '—';
     var bonus    = fmtBonus(row['Bonus']);
     var end      = row['End Date'] || '';
-    var ratio    = row['Transfer Ratio'] || '1:1';
+    var ratio    = row['Bonus Ratio'] || row['Transfer Ratio'] || '—';
     var rating   = fmtRating(row['Rating']);
     var days     = daysUntil(end);
     var expiring = !expired && days >= 0 && days <= 7;
@@ -198,8 +200,8 @@
       + '<div class="mbb-partner">' + partner + '</div>'
       + '<div class="mbb-divider"></div>'
       + '<div class="mbb-meta">'
-      + '<div class="mbb-meta-row"><span class="mbb-meta-label">Transfer Ratio'
-      + '<i class="mbb-info-icon" data-tip="Ratio already includes the transfer bonus amount">i</i>'
+      + '<div class="mbb-meta-row"><span class="mbb-meta-label">Bonus Ratio'
+      + '<i class="mbb-info-icon" data-tip="Base transfer ratio adjusted for the bonus">i</i>'
       + '</span><span class="mbb-meta-value">' + ratio + '</span></div>'
       + '<div class="mbb-meta-row"><span class="mbb-meta-label">' + (expired ? 'Expired' : 'Expires') + '</span>' + expiresVal + '</div>'
       + '</div></div>';
@@ -207,7 +209,7 @@
 
   function render(data, filter) {
     var active  = data.filter(function(r){ return daysUntil(r['End Date']) >= 0; });
-    var expired = data.filter(function(r){ return daysUntil(r['End Date']) < 0 && daysAgo(r['End Date']) <= 30; });
+    var expired = data.filter(function(r){ return daysUntil(r['End Date']) < 0; });
     var shown   = filter === 'all' ? active : active.filter(function(r){ return norm(r['Program']) === filter; });
 
     document.getElementById('mbb-grid').innerHTML = shown.length
@@ -217,7 +219,18 @@
     var wrap = document.getElementById('mbb-expired-wrap');
     if (expired.length) {
       wrap.style.display = 'block';
-      document.getElementById('mbb-expired-grid').innerHTML = expired.map(function(r){ return card(r, true); }).join('');
+      var rows = expired.map(function(r) {
+        var rating = fmtRating(r['Rating']);
+        return '<tr>'
+          + '<td><span class="mbb-exp-prog">' + norm(r['Program']) + '</span></td>'
+          + '<td>' + (r['Partner'] || '—') + '</td>'
+          + '<td><span class="mbb-exp-bonus">' + fmtBonus(r['Bonus']) + '</span></td>'
+          + '<td>' + fmtDate(r['End Date']) + '</td>'
+          + '<td>' + (r['Bonus Ratio'] || r['Transfer Ratio'] || '—') + '</td>'
+          + '<td>' + (rating || '—') + '</td>'
+          + '</tr>';
+      }).join('');
+      document.getElementById('mbb-expired-table-body').innerHTML = rows;
     } else {
       wrap.style.display = 'none';
     }
