@@ -156,7 +156,7 @@
     var cls   = n > 0 ? 'pos' : 'neg';
     var icons = '';
     for (var i = 0; i < Math.abs(n); i++) icons += icon;
-    return '<span class="mbb-rating ' + cls + '">' + icons + '</span>';
+    return '<span class="mbb-rating ' + cls + '">Advait\'s Rating: ' + icons + '</span>';
   }
 
   function fmtBonus(val) {
