@@ -51,7 +51,10 @@
     '.mbb-card.mbb-expired .mbb-bonus{color:#bbb}',
     '.mbb-card.mbb-expired .mbb-program-badge{background:#9aabbb}',
     '.mbb-card.mbb-expired:hover{transform:none;box-shadow:none}',
-    '.mbb-expired-tag{background:#e2ddd4;color:#8a9aaa;font-size:.68rem;font-weight:700;letter-spacing:.04em;padding:5px 10px;border-radius:100px}'
+    '.mbb-expired-tag{background:#e2ddd4;color:#8a9aaa;font-size:.68rem;font-weight:700;letter-spacing:.04em;padding:5px 10px;border-radius:100px}',
+    '.mbb-rating{display:inline-flex;align-items:center;gap:3px;padding:4px 10px;border-radius:100px;font-size:.72rem;font-weight:700;margin-top:8px}',
+    '.mbb-rating.pos{background:#e6f9f0;color:#1a7a4a}',
+    '.mbb-rating.neg{background:#fdecea;color:#c0392b}'
   ].join('');
   document.head.appendChild(style);
 
@@ -146,6 +149,16 @@
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
+  function fmtRating(val) {
+    var n = parseInt(val, 10);
+    if (!n || n === 0) return '';
+    var icon  = n > 0 ? '👍' : '👎';
+    var cls   = n > 0 ? 'pos' : 'neg';
+    var icons = '';
+    for (var i = 0; i < Math.abs(n); i++) icons += icon;
+    return '<span class="mbb-rating ' + cls + '">' + icons + '</span>';
+  }
+
   function fmtBonus(val) {
     if (!val || val === '—') return '—';
     var s = String(val).trim();
@@ -162,6 +175,7 @@
     var bonus    = fmtBonus(row['Bonus']);
     var end      = row['End Date'] || '';
     var ratio    = row['Transfer Ratio'] || '1:1';
+    var rating   = fmtRating(row['Rating']);
     var days     = daysUntil(end);
     var expiring = !expired && days >= 0 && days <= 7;
 
@@ -178,6 +192,7 @@
 
     return '<div class="mbb-card' + (expired ? ' mbb-expired' : '') + '">'
       + '<div class="mbb-card-top"><span class="mbb-program-badge">' + program + '</span>' + badge + '</div>'
+      + (rating ? '<div>' + rating + '</div>' : '')
       + '<div class="mbb-bonus-wrap"><span class="mbb-bonus">' + bonus + '</span><span class="mbb-bonus-label">Transfer Bonus</span></div>'
       + '<div class="mbb-partner">' + partner + '</div>'
       + '<div class="mbb-divider"></div>'
