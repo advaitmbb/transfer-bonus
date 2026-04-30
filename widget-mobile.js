@@ -258,6 +258,3 @@
         '<div class="mbm-state">Unable to load bonuses — please check back shortly.</div>';
     });
 })();
-
-
-
