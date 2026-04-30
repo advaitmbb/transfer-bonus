@@ -1,4 +1,4 @@
-(function () {
+function () {
   var link = document.createElement('link');
   link.rel = 'stylesheet';
   link.href = 'https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=Inter:wght@400;500;600&display=swap';
@@ -9,8 +9,8 @@
     '.mbm,.mbm *,.mbm *::before,.mbm *::after{box-sizing:border-box;margin:0;padding:0}',
 
     /* Wrapper — fully constrained */
-    '.mbm{font-family:"Inter",sans-serif;background:#faf6ee;padding:28px 0 48px;width:100%;overflow:hidden;display:block}',
-    '.mbm-inner{padding:0 14px;width:100%;overflow:hidden}',
+    '.mbm{font-family:"Inter",sans-serif;background:#faf6ee;padding:24px 0 40px;width:100%;max-width:100%;overflow:hidden;display:block}',
+    '.mbm-inner{padding:0 10px;width:100%;max-width:100%;overflow:hidden}',
 
     /* Header */
     '.mbm-header{text-align:center;margin-bottom:24px}',
@@ -19,14 +19,14 @@
     '.mbm-updated{font-size:.7rem;color:#a0b0be}',
 
     /* Filters — horizontal scroll, no overflow on page */
-    '.mbm-select-wrap{padding:0 14px;margin-bottom:18px}',
+    '.mbm-select-wrap{padding:0 10px;margin-bottom:16px;width:100%;max-width:100%}',
     '.mbm-select{width:100%;padding:10px 40px 10px 16px;border-radius:100px;border:2px solid #1a2b3c;background:#fff;color:#1a2b3c;font-family:"Inter",sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'8\' viewBox=\'0 0 12 8\'%3E%3Cpath d=\'M1 1l5 5 5-5\' stroke=\'%231a2b3c\' stroke-width=\'2\' fill=\'none\' stroke-linecap=\'round\'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center}',
 
     /* List */
     '.mbm-list{display:flex;flex-direction:column;gap:9px;margin-bottom:32px;width:100%}',
 
     /* Card — fully vertical, no horizontal flex that can overflow */
-    '.mbm-card{background:#fff;border-radius:14px;border-top:3px solid #38b6ff;padding:13px 14px;box-shadow:0 2px 10px rgba(26,43,60,.06);width:100%;display:block}',
+    '.mbm-card{background:#fff;border-radius:14px;border-top:3px solid #38b6ff;padding:11px 12px;box-shadow:0 2px 10px rgba(26,43,60,.06);width:100%;max-width:100%;display:block;overflow:hidden}',
     '.mbm-card-top{display:flex;align-items:center;gap:5px;margin-bottom:5px;flex-wrap:wrap}',
     '.mbm-prog{background:#1a2b3c;color:#fff;font-size:.58rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:100px;white-space:nowrap}',
     '.mbm-expiring{background:#fff3cd;color:#c07000;font-size:.58rem;font-weight:700;padding:3px 8px;border-radius:100px;white-space:nowrap}',
@@ -67,8 +67,7 @@
   document.body.style.overflowX = 'hidden';
 
   var wrapper = document.createElement('div');
-  var vw = window.innerWidth;
-  wrapper.style.cssText = 'width:' + vw + 'px;max-width:' + vw + 'px;overflow:hidden;display:block;position:relative;left:0';
+  wrapper.style.cssText = 'width:100%;max-width:100%;overflow:hidden;display:block';
   wrapper.innerHTML = [
     '<div class="mbm">',
     '  <div class="mbm-inner">',
@@ -92,12 +91,6 @@
   ].join('');
   me.parentNode.insertBefore(wrapper, me);
 
-  /* Lock all containers to exact viewport width */
-  var vwpx = window.innerWidth + 'px';
-  ['mbm-select-wrap', 'mbm-list', 'mbm-expired-wrap'].forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el) { el.style.width = vwpx; el.style.maxWidth = vwpx; }
-  });
 
   /* ── Helpers ── */
   var API_URL = 'https://script.google.com/macros/s/AKfycby5q9p_Ik2MA8ePJCH0PjdDeRaCqmO2eSpRRGM6SV3Xf6n4WgI5_gUp3ioNqy6dEbF4/exec';
@@ -244,4 +237,3 @@
         '<div class="mbm-state">Unable to load bonuses — please check back shortly.</div>';
     });
 })();
-
