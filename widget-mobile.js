@@ -19,13 +19,8 @@
     '.mbm-updated{font-size:.7rem;color:#a0b0be}',
 
     /* Filters — horizontal scroll, no overflow on page */
-    '.mbm-filters-wrap{width:100%;overflow:hidden;margin-bottom:18px}',
-    '.mbm-filters{display:flex;gap:7px;overflow-x:auto;overflow-y:hidden;padding:0 14px 8px;-webkit-overflow-scrolling:touch;scrollbar-width:none}',
-    '.mbm-filters::-webkit-scrollbar{display:none}',
-    '.mbm-filter-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:100px;border:2px solid #1a2b3c;background:transparent;color:#1a2b3c;font-family:"Inter",sans-serif;font-size:.75rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .18s ease}',
-    '.mbm-filter-btn.active{background:#1a2b3c;color:#faf6ee}',
-    '.mbm-count{display:inline-flex;align-items:center;justify-content:center;background:#38b6ff;color:#fff;font-size:.62rem;font-weight:700;width:15px;height:15px;border-radius:100px}',
-    '.mbm-filter-btn.active .mbm-count{background:rgba(255,255,255,.25)}',
+    '.mbm-select-wrap{padding:0 14px;margin-bottom:18px}',
+    '.mbm-select{width:100%;padding:10px 40px 10px 16px;border-radius:100px;border:2px solid #1a2b3c;background:#fff;color:#1a2b3c;font-family:"Inter",sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'8\' viewBox=\'0 0 12 8\'%3E%3Cpath d=\'M1 1l5 5 5-5\' stroke=\'%231a2b3c\' stroke-width=\'2\' fill=\'none\' stroke-linecap=\'round\'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center}',
 
     /* List */
     '.mbm-list{display:flex;flex-direction:column;gap:9px;margin-bottom:32px;width:100%}',
@@ -83,8 +78,8 @@
     '      <p class="mbm-updated" id="mbm-updated"></p>',
     '    </div>',
     '  </div>',
-    '  <div class="mbm-filters-wrap">',
-    '    <div class="mbm-filters" id="mbm-filters"><button class="mbm-filter-btn active" data-filter="all">All</button></div>',
+    '  <div class="mbm-select-wrap">',
+    '    <select class="mbm-select" id="mbm-select"><option value="all">All Programs</option></select>',
     '  </div>',
     '  <div class="mbm-inner">',
     '    <div class="mbm-list" id="mbm-list"><div class="mbm-state">Loading bonuses…</div></div>',
@@ -99,7 +94,7 @@
 
   /* Lock all containers to exact viewport width */
   var vwpx = window.innerWidth + 'px';
-  ['mbm-filters', 'mbm-filters-wrap', 'mbm-list', 'mbm-expired-wrap'].forEach(function(id) {
+  ['mbm-select-wrap', 'mbm-list', 'mbm-expired-wrap'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el) { el.style.width = vwpx; el.style.maxWidth = vwpx; }
   });
@@ -225,18 +220,14 @@
     active.forEach(function(r){ var p = norm(r['Program']); if (programs.indexOf(p) === -1) programs.push(p); });
     programs.sort();
 
-    var el = document.getElementById('mbm-filters');
-    el.innerHTML = '<button class="mbm-filter-btn active" data-filter="all">All <span class="mbm-count">' + active.length + '</span></button>';
+    var sel = document.getElementById('mbm-select');
+    sel.innerHTML = '<option value="all">All Programs (' + active.length + ')</option>';
     programs.forEach(function(p) {
       var n = active.filter(function(r){ return norm(r['Program']) === p; }).length;
-      el.innerHTML += '<button class="mbm-filter-btn" data-filter="' + p + '">' + p + ' <span class="mbm-count">' + n + '</span></button>';
+      sel.innerHTML += '<option value="' + p + '">' + p + ' (' + n + ')</option>';
     });
-    el.querySelectorAll('.mbm-filter-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        el.querySelectorAll('.mbm-filter-btn').forEach(function(b){ b.classList.remove('active'); });
-        btn.classList.add('active');
-        render(data, btn.getAttribute('data-filter'));
-      });
+    sel.addEventListener('change', function() {
+      render(data, sel.value);
     });
   }
 
@@ -253,3 +244,4 @@
         '<div class="mbm-state">Unable to load bonuses — please check back shortly.</div>';
     });
 })();
+
