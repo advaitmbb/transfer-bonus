@@ -19,7 +19,7 @@
     '.mbm-updated{font-size:.7rem;color:#a0b0be}',
 
     /* Filters — horizontal scroll, no overflow on page */
-    '.mbm-filters-wrap{overflow:hidden;margin-bottom:18px}',
+    '.mbm-filters-wrap{width:100%;overflow:hidden;margin-bottom:18px}',
     '.mbm-filters{display:flex;gap:7px;overflow-x:auto;overflow-y:hidden;padding:0 14px 8px;-webkit-overflow-scrolling:touch;scrollbar-width:none}',
     '.mbm-filters::-webkit-scrollbar{display:none}',
     '.mbm-filter-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:100px;border:2px solid #1a2b3c;background:transparent;color:#1a2b3c;font-family:"Inter",sans-serif;font-size:.75rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .18s ease}',
@@ -97,17 +97,12 @@
   ].join('');
   me.parentNode.insertBefore(wrapper, me);
 
-  /* Re-lock widths after layout */
-  setTimeout(function() {
-    var w = window.innerWidth;
-    wrapper.style.width = w + 'px';
-    wrapper.style.maxWidth = w + 'px';
-    var fw = document.getElementById('mbm-filters');
-    if (fw) {
-      fw.style.width = w + 'px';
-      fw.style.maxWidth = w + 'px';
-    }
-  }, 100);
+  /* Lock all containers to exact viewport width */
+  var vwpx = window.innerWidth + 'px';
+  ['mbm-filters', 'mbm-filters-wrap', 'mbm-list', 'mbm-expired-wrap'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) { el.style.width = vwpx; el.style.maxWidth = vwpx; }
+  });
 
   /* ── Helpers ── */
   var API_URL = 'https://script.google.com/macros/s/AKfycby5q9p_Ik2MA8ePJCH0PjdDeRaCqmO2eSpRRGM6SV3Xf6n4WgI5_gUp3ioNqy6dEbF4/exec';
