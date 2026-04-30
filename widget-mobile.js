@@ -9,8 +9,8 @@
     '.mbm,.mbm *,.mbm *::before,.mbm *::after{box-sizing:border-box;margin:0;padding:0}',
 
     /* Wrapper — fully constrained */
-    '.mbm{font-family:"Inter",sans-serif;background:#faf6ee;padding:28px 0 48px;width:100%;max-width:100%;overflow:hidden;display:block}',
-    '.mbm-inner{padding:0 14px;width:100%;max-width:100%}',
+    '.mbm{font-family:"Inter",sans-serif;background:#faf6ee;padding:28px 0 48px;width:100%;overflow:hidden;display:block}',
+    '.mbm-inner{padding:0 14px;width:100%;overflow:hidden}',
 
     /* Header */
     '.mbm-header{text-align:center;margin-bottom:24px}',
@@ -66,8 +66,14 @@
   /* ── HTML ── */
   var scripts = document.getElementsByTagName('script');
   var me = scripts[scripts.length - 1];
+
+  /* Force page to not scroll horizontally */
+  document.documentElement.style.overflowX = 'hidden';
+  document.body.style.overflowX = 'hidden';
+
   var wrapper = document.createElement('div');
-  wrapper.style.cssText = 'width:100%;max-width:100%;overflow:hidden;display:block';
+  var vw = window.innerWidth;
+  wrapper.style.cssText = 'width:' + vw + 'px;max-width:' + vw + 'px;overflow:hidden;display:block;position:relative;left:0';
   wrapper.innerHTML = [
     '<div class="mbm">',
     '  <div class="mbm-inner">',
@@ -90,6 +96,13 @@
     '</div>'
   ].join('');
   me.parentNode.insertBefore(wrapper, me);
+
+  /* Re-lock width after layout */
+  setTimeout(function() {
+    var w = window.innerWidth;
+    wrapper.style.width = w + 'px';
+    wrapper.style.maxWidth = w + 'px';
+  }, 100);
 
   /* ── Helpers ── */
   var API_URL = 'https://script.google.com/macros/s/AKfycby5q9p_Ik2MA8ePJCH0PjdDeRaCqmO2eSpRRGM6SV3Xf6n4WgI5_gUp3ioNqy6dEbF4/exec';
@@ -240,4 +253,5 @@
         '<div class="mbm-state">Unable to load bonuses — please check back shortly.</div>';
     });
 })();
+
 
