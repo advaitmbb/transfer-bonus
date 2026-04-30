@@ -19,8 +19,8 @@
     '.mbm-updated{font-size:.7rem;color:#a0b0be}',
 
     /* Filters — horizontal scroll, no overflow on page */
-    '.mbm-filters-wrap{width:100%;overflow:hidden;margin-bottom:18px}',
-    '.mbm-filters{display:flex;gap:7px;overflow-x:auto;padding:0 14px 8px;-webkit-overflow-scrolling:touch;scrollbar-width:none}',
+    '.mbm-filters-wrap{overflow:hidden;margin-bottom:18px}',
+    '.mbm-filters{display:flex;gap:7px;overflow-x:auto;overflow-y:hidden;padding:0 14px 8px;-webkit-overflow-scrolling:touch;scrollbar-width:none}',
     '.mbm-filters::-webkit-scrollbar{display:none}',
     '.mbm-filter-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:100px;border:2px solid #1a2b3c;background:transparent;color:#1a2b3c;font-family:"Inter",sans-serif;font-size:.75rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .18s ease}',
     '.mbm-filter-btn.active{background:#1a2b3c;color:#faf6ee}',
@@ -97,11 +97,16 @@
   ].join('');
   me.parentNode.insertBefore(wrapper, me);
 
-  /* Re-lock width after layout */
+  /* Re-lock widths after layout */
   setTimeout(function() {
     var w = window.innerWidth;
     wrapper.style.width = w + 'px';
     wrapper.style.maxWidth = w + 'px';
+    var fw = document.getElementById('mbm-filters');
+    if (fw) {
+      fw.style.width = w + 'px';
+      fw.style.maxWidth = w + 'px';
+    }
   }, 100);
 
   /* ── Helpers ── */
@@ -253,5 +258,6 @@
         '<div class="mbm-state">Unable to load bonuses — please check back shortly.</div>';
     });
 })();
+
 
 
