@@ -38,9 +38,11 @@
     '.mbm-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}',
     '.mbm-meta-item{font-size:.71rem;color:#8a9aaa}',
     '.mbm-meta-item strong{color:#1a2b3c;font-weight:600}',
-    '.mbm-rating{font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:100px}',
+    '.mbm-rating{font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:100px;display:inline-flex;align-items:center;gap:3px}',
     '.mbm-rating.pos{background:#e6f9f0;color:#1a7a4a}',
     '.mbm-rating.neg{background:#fdecea;color:#c0392b}',
+    '.mbm-rating-lbl{font-size:.54rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;opacity:.8}',
+    '.mbm-rating-icons{font-size:.62rem}',
 
     /* State */
     '.mbm-state{text-align:center;padding:36px 16px;color:#a0b0be;font-size:.88rem}',
@@ -149,7 +151,7 @@
     var cls  = n > 0 ? 'pos' : 'neg';
     var icons = '';
     for (var i = 0; i < Math.abs(n); i++) icons += icon;
-    return '<span class="mbm-rating ' + cls + '">' + icons + '</span>';
+    return '<span class="mbm-rating ' + cls + '"><span class="mbm-rating-lbl">Advait\'s Rating</span><span class="mbm-rating-icons">' + icons + '</span></span>';
   }
 
   function card(row) {
@@ -240,4 +242,3 @@
         '<div class="mbm-state">Unable to load bonuses — please check back shortly.</div>';
     });
 })();
-
