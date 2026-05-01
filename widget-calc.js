@@ -57,6 +57,11 @@
     '.mbc-res-row-v{font-family:"Fraunces",serif;font-size:1.1rem;font-weight:700;color:#c8d8e4}',
     '.mbc-res-row-v.blue{color:#38b6ff}',
 
+    /* Footer */
+    '.mbc-footer{text-align:center;margin-top:24px}',
+    '.mbc-footer a{font-size:.78rem;color:#8a9aaa;text-decoration:none;border-bottom:1px solid #c8d4dc;padding-bottom:1px;transition:color .15s,border-color .15s}',
+    '.mbc-footer a:hover{color:#1a2b3c;border-color:#1a2b3c}',
+
     /* State */
     '.mbc-state{text-align:center;padding:48px 16px;color:#a0b0be;font-size:.88rem}',
   ].join('');
@@ -74,6 +79,7 @@
     '      <p class="mbc-subtitle">See exactly how many points you\'ll receive — including any active transfer bonuses</p>',
     '    </div>',
     '    <div id="mbc-body"><div class="mbc-state">Loading…</div></div>',
+    '    <div class="mbc-footer"><a href="https://milesbeyondborders.com/transfer-bonuses" target="_blank">View all active transfer bonuses →</a></div>',
     '  </div>',
     '</div>',
   ].join('');
