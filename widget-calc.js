@@ -11,9 +11,14 @@
     '.mbc-inner{max-width:700px;margin:0 auto;padding:0 24px}',
 
     /* Header */
-    '.mbc-header{text-align:center;margin-bottom:32px}',
+    '.mbc-header{text-align:center;margin-bottom:28px}',
     '.mbc-title{font-family:"Fraunces",serif;font-size:2rem;font-weight:700;color:#1a2b3c;line-height:1.2;margin-bottom:8px}',
     '.mbc-subtitle{font-size:.88rem;color:#6b7e8f;line-height:1.5}',
+
+    /* Mode toggle */
+    '.mbc-toggle{display:flex;background:#e8e2d8;border-radius:100px;padding:4px;margin-bottom:24px;gap:4px}',
+    '.mbc-tog{flex:1;padding:10px 16px;border-radius:100px;border:none;background:transparent;color:#6b7e8f;font-family:"Inter",sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:background .18s,color .18s;text-align:center}',
+    '.mbc-tog.active{background:#1a2b3c;color:#fff}',
 
     /* Dropdowns row */
     '.mbc-selects{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}',
@@ -26,7 +31,6 @@
     '.mbc-rate-card{background:#fff;border-radius:16px;padding:20px 24px;box-shadow:0 2px 12px rgba(26,43,60,.07);margin-bottom:20px}',
     '.mbc-rate-ph{color:#b8c4cc;font-size:.85rem;text-align:center;padding:10px 0}',
     '.mbc-bonus-pill{display:inline-flex;align-items:center;gap:6px;background:#e6f9f0;color:#1a7a4a;font-size:.7rem;font-weight:700;padding:5px 12px;border-radius:100px;margin-bottom:14px;letter-spacing:.02em}',
-    '.mbc-rate-rows{}',
     '.mbc-rate-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f4f0e8}',
     '.mbc-rate-row:last-child{border-bottom:none}',
     '.mbc-rate-key{font-size:.76rem;color:#8a9aaa;font-weight:500}',
@@ -78,7 +82,7 @@
   /* ── Helpers ── */
   var API = 'https://script.google.com/macros/s/AKfycby5q9p_Ik2MA8ePJCH0PjdDeRaCqmO2eSpRRGM6SV3Xf6n4WgI5_gUp3ioNqy6dEbF4/exec';
   var allRates = [], allBonuses = [];
-  var cur = { bank: '', loyalty: '', ratio: 1, bonusMult: 1 };
+  var cur = { bank: '', loyalty: '', ratio: 1, bonusMult: 1, mode: 'forward' };
 
   function normBank(p) {
     p = (p || '').toLowerCase();
@@ -132,16 +136,16 @@
   }
 
   function fmtNum(n) { return Math.round(n).toLocaleString('en-US'); }
+  function fmtEffRate(r) { return '1:' + (Number.isInteger(r) ? r : r.toFixed(2)); }
 
-  function fmtEffRate(r) {
-    return '1:' + (Number.isInteger(r) ? r : r.toFixed(2));
-  }
+  function normStr(s) { return (s || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
 
   function findBonus(bank, loyalty) {
-    var bl = loyalty.toLowerCase();
+    var bl = normStr(loyalty);
     return allBonuses.find(function (b) {
+      var partner = normStr(b['Partner']);
       return normBank(b['Program']) === bank
-        && (b['Partner'] || '').toLowerCase() === bl
+        && (partner === bl || partner.includes(bl) || bl.includes(partner))
         && isActive(b['End Date']);
     }) || null;
   }
@@ -153,36 +157,53 @@
     });
     if (!rate) return;
 
-    var bonus    = findBonus(bank, loyalty);
+    var bonus     = findBonus(bank, loyalty);
     var baseRatio = parseRatio(rate['Transfer Rate']);
     var bonusFrac = bonus ? parseBonusFrac(bonus['Bonus']) : 0;
     var bonusMult = 1 + bonusFrac;
     var effRatio  = baseRatio * bonusMult;
 
-    cur.ratio = baseRatio;
+    cur.ratio     = baseRatio;
     cur.bonusMult = bonusMult;
-    cur.loyalty = loyalty;
-    cur.bank = bank;
+    cur.loyalty   = loyalty;
+    cur.bank      = bank;
 
     var html = '';
     if (bonus) {
       var pct = Math.round(bonusFrac * 100);
       html += '<div class="mbc-bonus-pill">🎉 ' + pct + '% Transfer Bonus Active &nbsp;·&nbsp; Ends ' + fmtDate(bonus['End Date']) + '</div>';
     }
-    html += '<div class="mbc-rate-rows">';
     html += '<div class="mbc-rate-row"><span class="mbc-rate-key">Base Transfer Rate</span><span class="mbc-rate-val">' + rate['Transfer Rate'] + '</span></div>';
     if (bonus) {
       html += '<div class="mbc-rate-row"><span class="mbc-rate-key">Active Bonus</span><span class="mbc-rate-val hi">+' + Math.round(bonusFrac * 100) + '%</span></div>';
       html += '<div class="mbc-rate-row"><span class="mbc-rate-key">Effective Rate</span><span class="mbc-rate-val hi">' + fmtEffRate(effRatio) + '</span></div>';
     }
-    html += '</div>';
 
     document.getElementById('mbc-rate-ph').style.display = 'none';
     var rc = document.getElementById('mbc-rate-content');
     rc.innerHTML = html;
     rc.style.display = 'block';
     document.getElementById('mbc-inp-section').style.display = 'block';
+    updateInputLabel();
     calculate();
+  }
+
+  /* ── Update input label based on mode ── */
+  function updateInputLabel() {
+    var lbl = document.getElementById('mbc-inp-lbl');
+    var suf = document.getElementById('mbc-inp-suf');
+    if (!lbl) return;
+    if (cur.mode === 'reverse') {
+      lbl.textContent = cur.loyalty ? cur.loyalty + ' points you need' : 'Loyalty points you need';
+      if (suf) suf.textContent = cur.loyalty ? cur.loyalty.split(' ')[0].toLowerCase() + ' pts' : 'pts';
+    } else {
+      lbl.textContent = 'Points to transfer from ' + (cur.bank || 'your bank');
+      if (suf) suf.textContent = 'pts';
+    }
+    var inp = document.getElementById('mbc-input');
+    if (inp) { inp.value = ''; inp.placeholder = 'e.g. ' + (cur.mode === 'reverse' ? '100,000' : '50,000'); }
+    var res = document.getElementById('mbc-result');
+    if (res) res.classList.remove('on');
   }
 
   /* ── Calculate ── */
@@ -194,20 +215,40 @@
     if (!res) return;
     if (!pts || !cur.ratio) { res.classList.remove('on'); return; }
 
-    var baseOut  = pts * cur.ratio;
-    var bonusOut = pts * cur.ratio * cur.bonusMult;
-    var hasBonus = cur.bonusMult > 1;
-    var mainNum  = hasBonus ? bonusOut : baseOut;
-
     var html = '';
-    html += '<div class="mbc-res-lbl">You\'ll receive</div>';
-    html += '<div class="mbc-res-num">' + fmtNum(mainNum) + '</div>';
-    html += '<div class="mbc-res-prog">' + cur.loyalty + ' points</div>';
-    if (hasBonus) {
-      html += '<div class="mbc-res-row"><span class="mbc-res-row-k">With transfer bonus</span><span class="mbc-res-row-v blue">' + fmtNum(bonusOut) + ' pts</span></div>';
-      html += '<div class="mbc-res-row"><span class="mbc-res-row-k">Without bonus (base rate)</span><span class="mbc-res-row-v">' + fmtNum(baseOut) + ' pts</span></div>';
+
+    if (cur.mode === 'forward') {
+      var baseOut  = pts * cur.ratio;
+      var bonusOut = pts * cur.ratio * cur.bonusMult;
+      var hasBonus = cur.bonusMult > 1;
+      var mainNum  = hasBonus ? bonusOut : baseOut;
+
+      html += '<div class="mbc-res-lbl">You\'ll receive</div>';
+      html += '<div class="mbc-res-num">' + fmtNum(mainNum) + '</div>';
+      html += '<div class="mbc-res-prog">' + cur.loyalty + ' points</div>';
+      if (hasBonus) {
+        html += '<div class="mbc-res-row"><span class="mbc-res-row-k">With transfer bonus</span><span class="mbc-res-row-v blue">' + fmtNum(bonusOut) + ' pts</span></div>';
+        html += '<div class="mbc-res-row"><span class="mbc-res-row-k">Without bonus (base rate)</span><span class="mbc-res-row-v">' + fmtNum(baseOut) + ' pts</span></div>';
+      }
+      html += '<div class="mbc-res-row"><span class="mbc-res-row-k">Points transferred from ' + cur.bank + '</span><span class="mbc-res-row-v">' + fmtNum(pts) + ' pts</span></div>';
+
+    } else {
+      /* Reverse: pts = loyalty points needed, solve for bank points */
+      var baseNeeded  = pts / cur.ratio;
+      var bonusNeeded = pts / (cur.ratio * cur.bonusMult);
+      var hasBonus    = cur.bonusMult > 1;
+      var mainNum     = hasBonus ? bonusNeeded : baseNeeded;
+
+      html += '<div class="mbc-res-lbl">You\'ll need to transfer</div>';
+      html += '<div class="mbc-res-num">' + fmtNum(mainNum) + '</div>';
+      html += '<div class="mbc-res-prog">' + cur.bank + ' points</div>';
+      if (hasBonus) {
+        html += '<div class="mbc-res-row"><span class="mbc-res-row-k">With active bonus</span><span class="mbc-res-row-v blue">' + fmtNum(bonusNeeded) + ' pts</span></div>';
+        html += '<div class="mbc-res-row"><span class="mbc-res-row-k">Without bonus (base rate)</span><span class="mbc-res-row-v">' + fmtNum(baseNeeded) + ' pts</span></div>';
+      }
+      html += '<div class="mbc-res-row"><span class="mbc-res-row-k">Target ' + cur.loyalty + ' points</span><span class="mbc-res-row-v">' + fmtNum(pts) + ' pts</span></div>';
     }
-    html += '<div class="mbc-res-row"><span class="mbc-res-row-k">Points transferred from ' + cur.bank + '</span><span class="mbc-res-row-v">' + fmtNum(pts) + ' pts</span></div>';
+
     res.innerHTML = html;
     res.classList.add('on');
   }
@@ -219,6 +260,10 @@
     banks.sort();
 
     document.getElementById('mbc-body').innerHTML = [
+      '<div class="mbc-toggle">',
+      '  <button class="mbc-tog active" id="mbc-tog-fwd">How many will I get?</button>',
+      '  <button class="mbc-tog" id="mbc-tog-rev">How many do I need?</button>',
+      '</div>',
       '<div class="mbc-selects">',
       '  <div class="mbc-sel-group">',
       '    <span class="mbc-lbl">1. Your Bank Program</span>',
@@ -235,16 +280,33 @@
       '</div>',
       '<div id="mbc-inp-section" style="display:none">',
       '  <div class="mbc-inp-group">',
-      '    <label class="mbc-inp-lbl" for="mbc-input">Points to transfer</label>',
+      '    <label class="mbc-inp-lbl" id="mbc-inp-lbl" for="mbc-input">Points to transfer</label>',
       '    <div class="mbc-inp-wrap">',
       '      <input class="mbc-inp" type="text" id="mbc-input" placeholder="e.g. 50,000" inputmode="numeric" autocomplete="off">',
-      '      <span class="mbc-inp-suf">pts</span>',
+      '      <span class="mbc-inp-suf" id="mbc-inp-suf">pts</span>',
       '    </div>',
       '  </div>',
       '  <div class="mbc-result" id="mbc-result"></div>',
       '</div>',
     ].join('');
 
+    /* Toggle buttons */
+    document.getElementById('mbc-tog-fwd').addEventListener('click', function () {
+      cur.mode = 'forward';
+      document.getElementById('mbc-tog-fwd').classList.add('active');
+      document.getElementById('mbc-tog-rev').classList.remove('active');
+      updateInputLabel();
+      calculate();
+    });
+    document.getElementById('mbc-tog-rev').addEventListener('click', function () {
+      cur.mode = 'reverse';
+      document.getElementById('mbc-tog-rev').classList.add('active');
+      document.getElementById('mbc-tog-fwd').classList.remove('active');
+      updateInputLabel();
+      calculate();
+    });
+
+    /* Bank dropdown */
     var bankSel = document.getElementById('mbc-bank-sel');
     banks.forEach(function (b) {
       var opt = document.createElement('option');
@@ -292,7 +354,6 @@
       else resetLoyalty();
     });
 
-    /* Live comma-formatted input */
     document.getElementById('mbc-input').addEventListener('input', function () {
       var raw = this.value.replace(/[^0-9]/g, '');
       if (raw) {
