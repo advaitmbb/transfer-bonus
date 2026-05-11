@@ -108,13 +108,16 @@
   var API_URL = 'https://script.google.com/macros/s/AKfycby5q9p_Ik2MA8ePJCH0PjdDeRaCqmO2eSpRRGM6SV3Xf6n4WgI5_gUp3ioNqy6dEbF4/exec';
 
   function norm(p) {
-    p = (p || '').toLowerCase();
+    var original = (p || '').trim();
+    p = original.toLowerCase();
     if (p.includes('amex') || p.includes('american express') || p.includes('membership')) return 'Amex';
     if (p.includes('bilt'))        return 'Bilt';
     if (p.includes('capital one')) return 'Capital One';
     if (p.includes('chase') || p.includes('ultimate')) return 'Chase';
     if (p.includes('citi') || p.includes('thankyou')) return 'Citi';
-    return p;
+    if (p.includes('rove'))        return 'Rove';
+    if (p.includes('rbc') || p.includes('avion')) return 'RBC Avion';
+    return original;
   }
 
   function parseDate(s) {
@@ -270,4 +273,3 @@
         '<div class="mbb-state">Unable to load bonuses — please check back shortly.</div>';
     });
 })();
-

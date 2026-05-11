@@ -91,7 +91,8 @@
   var cur = { bank: '', loyalty: '', ratio: 1, bonusMult: 1, mode: 'forward' };
 
   function normBank(p) {
-    p = (p || '').toLowerCase();
+    var original = (p || '').trim();
+    p = original.toLowerCase();
     if (p.includes('amex') || p.includes('american express') || p.includes('membership')) return 'Amex';
     if (p.includes('bilt'))         return 'Bilt';
     if (p.includes('capital one'))  return 'Capital One';
@@ -99,7 +100,8 @@
     if (p.includes('citi') || p.includes('thankyou') || p.includes('thank you')) return 'Citi';
     if (p.includes('rove'))         return 'Rove';
     if (p.includes('wells fargo'))  return 'Wells Fargo';
-    return p;
+    if (p.includes('rbc') || p.includes('avion')) return 'RBC Avion';
+    return original;
   }
 
   function parseRatio(s) {
@@ -155,7 +157,7 @@
     var bl = normStr(loyalty);
     return allBonuses.find(function (b) {
       var partner = normStr(b['Partner']);
-      return normBank(b['Program']) === bank
+      return normBank(b['Program']).toLowerCase() === bank.toLowerCase()
         && (partner === bl || partner.includes(bl) || bl.includes(partner))
         && isActive(b['End Date']);
     }) || null;
