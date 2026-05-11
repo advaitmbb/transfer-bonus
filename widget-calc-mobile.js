@@ -157,7 +157,7 @@
     var bl = normStr(loyalty);
     return allBonuses.find(function (b) {
       var partner = normStr(b['Partner']);
-      return normBank(b['Program']).toLowerCase() === bank.toLowerCase()
+      return normBank(b['Program']).toLowerCase() === normBank(bank).toLowerCase()
         && (partner === bl || partner.includes(bl) || bl.includes(partner))
         && isActive(b['End Date']);
     }) || null;
