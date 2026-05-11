@@ -99,6 +99,7 @@
     if (p.includes('citi') || p.includes('thankyou') || p.includes('thank you')) return 'Citi';
     if (p.includes('rove'))         return 'Rove';
     if (p.includes('wells fargo'))  return 'Wells Fargo';
+    if (p.includes('rbc avion')) return '🇨🇦 RBC Avion';
     return p;
   }
 
