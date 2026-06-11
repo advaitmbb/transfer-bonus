@@ -105,7 +105,7 @@
   });
 
   /* ── Data & logic ── */
-  var API_URL = 'https://script.google.com/macros/s/AKfycby5q9p_Ik2MA8ePJCH0PjdDeRaCqmO2eSpRRGM6SV3Xf6n4WgI5_gUp3ioNqy6dEbF4/exec';
+  var API_URL = 'https://advaitmbb.github.io/transfer-bonus/data.json';
 
   function norm(p) {
     var original = (p || '').trim();
